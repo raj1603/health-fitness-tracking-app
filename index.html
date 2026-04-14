@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Fitness Tracker</title>
+    <style>
+        :root { --primary: #4F46E5; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; }
+        header { background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white; padding: 24px 20px; text-align: center; }
+        header h1 { font-size: 28px; margin-bottom: 4px; }
+        header p { opacity: 0.9; font-size: 14px; }
+        .container { max-width: 480px; margin: 0 auto; padding: 16px; }
+        .card { background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .card h3 { color: var(--primary); margin-bottom: 14px; font-size: 16px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .stat-box { background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white; padding: 16px; border-radius: 12px; text-align: center; }
+        .stat-box .value { font-size: 24px; font-weight: bold; }
+        .stat-box .label { font-size: 12px; opacity: 0.9; }
+        .stat-box.green { background: linear-gradient(135deg, #10B981, #059669); }
+        .stat-box.orange { background: linear-gradient(135deg, #F59E0B, #D97706); }
+        .stat-box.purple { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+        label { display: block; font-size: 13px; color: #64748b; margin-bottom: 6px; }
+        input, select, button { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; margin-bottom: 10px; background: white; }
+        button { background: var(--primary); color: white; border: none; font-weight: 600; cursor: pointer; }
+        button:hover { opacity: 0.9; }
+        .result { background: #f0f9ff; padding: 14px; border-radius: 10px; margin-top: 12px; font-size: 13px; display: none; }
+        .result.show { display: block; }
+        .progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin: 10px 0; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.5s; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Health Fitness Tracker</h1>
+        <p>By Raj Shekhar | B.Sc. IT Student</p>
+    </header>
+    <div class="container">
+        <!-- Stats -->
+        <div class="card">
+            <div class="stats-grid">
+                <div class="stat-box"><div class="value" id="steps">8420</div><div class="label">Steps</div></div>
+                <div class="stat-box green"><div class="value" id="calories">1980</div><div class="label">Calories</div></div>
+                <div class="stat-box orange"><div class="value" id="heartRate">76</div><div class="label">BPM</div></div>
+                <div class="stat-box purple"><div class="value" id="sleepScore">84</div><div class="label">Sleep</div></div>
+            </div>
+        </div>
+        <!-- BMI -->
+        <div class="card">
+            <h3>BMI Calculator</h3>
+            <label>Height (cm)</label><input type="number" id="height" placeholder="175">
+            <label>Weight (kg)</label><input type="number" id="weight" placeholder="70">
+            <button onclick="calcBMI()">Calculate BMI</button>
+            <div class="result" id="bmiResult"></div>
+        </div>
+        <!-- Diet -->
+        <div class="card">
+            <h3>Diet Planner</h3>
+            <label>Goal</label>
+            <select id="dietGoal"><option>Weight Loss</option><option>Muscle Gain</option><option>Maintenance</option></select>
+            <label>Preference</label>
+            <select id="dietPref"><option>Vegetarian</option><option>Eggetarian</option><option>Non-Vegetarian</option></select>
+            <button onclick="genDiet()">Generate Diet Plan</button>
+            <div class="result" id="dietResult"></div>
+        </div>
+        <!-- Steps -->
+        <div class="card">
+            <h3>Step Counter</h3>
+            <div class="progress-bar"><div class="progress-fill" id="stepProgress"></div></div>
+            <label>Daily steps: <span id="stepCount">8420</span>/10000</label>
+        </div>
+        <!-- Sleep -->
+        <div class="card">
+            <h3>Sleep Tracking</h3>
+            <label>Sleep Hours</label><input type="number" id="sleepHrs" placeholder="7">
+            <button onclick="analyzeSleep()">Analyze Sleep</button>
+            <div class="result" id="sleepResult"></div>
+        </div>
+        <!-- Workout -->
+        <div class="card">
+            <h3>AI Workout Planner</h3>
+            <label>Fitness Level</label>
+            <select id="fitLevel"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select>
+            <label>Goal</label>
+            <select id="workoutGoal"><option>Fat Loss</option><option>Muscle Gain</option><option>General Fitness</option></select>
+            <button onclick="genWorkout()">Generate Workout</button>
+            <div class="result" id="workoutResult"></div>
+        </div>
+    </div>
+    <script>
+        function calcBMI() {
+            const h = document.getElementById('height').value/100;
+            const w = document.getElementById('weight').value;
+            if(!h||!w)return;
+            const bmi = (w/(h*h)).toFixed(1);
+            let status = bmi<18.5?'Underweight':bmi<25?'Normal':bmi<30?'Overweight':'Obese';
+            document.getElementById('bmiResult').innerHTML='<b>BMI:</b> '+bmi+' | <b>Status:</b> '+status;
+            document.getElementById('bmiResult').classList.add('show');
+        }
+        function genDiet() {
+            const goal=document.getElementById('dietGoal').value,pref=document.getElementById('dietPref').value;
+            const plans={
+                'Weight Loss':{'Vegetarian':'Breakfast: Oats + fruits | Lunch: Brown rice, dal, salad | Snack: Roasted chana | Dinner: Veg soup + chapati','Eggetarian':'Breakfast: Omelette + whole wheat toast | Lunch: Grilled paneer salad | Snack: Greek yogurt | Dinner: Egg curry + veggies','Non-Vegetarian':'Breakfast: Boiled eggs + oats | Lunch: Grilled chicken salad | Snack: Protein shake | Dinner: Fish curry + veggies'},
+                'Muscle Gain':{'Vegetarian':'Breakfast: Paneer + banana shake | Lunch: Rajma rice + paneer | Snack: Protein bar + nuts | Dinner: Lentil pasta + veggies','Eggetarian':'Breakfast: 3 egg whites + oats | Lunch: Chicken + rice + veggies | Snack: Protein shake + banana | Dinner: Egg bhurji + whole wheat roti','Non-Vegetarian':'Breakfast: Chicken + oats | Lunch: Grilled chicken breast + rice | Snack: Whey protein + banana | Dinner: Fish + sweet potato'},
+                'Maintenance':{'Vegetarian':'Breakfast: Poha + sprouts | Lunch: Dal rice + salad | Snack: Fruit + nuts | Dinner: Roti + sabzi + dal','Eggetarian':'Breakfast: Eggs + toast | Lunch: Paneer curry + roti | Snack: Smoothie | Dinner: Egg curry + rice','Non-Vegetarian':'Breakfast: Eggs + paratha | Lunch: Chicken curry + rice | Snack: Yogurt + fruits | Dinner: Fish + roti'}
+            };
+            document.getElementById('dietResult').innerHTML=plans[goal][pref];
+            document.getElementById('dietResult').classList.add('show');
+        }
+        function analyzeSleep() {
+            const hrs=document.getElementById('sleepHrs').value;
+            if(!hrs)return;
+            let score=hrs>=7?90:hrs>=6?75:50;
+            let tips=hrs>=7?'Great sleep! Maintain this routine.':hrs>=6?'Try to get at least 7 hours. Go to bed 30 min earlier.';'Aim for 7-9 hours. Avoid screens before bed.';
+            document.getElementById('sleepResult').innerHTML='<b>Sleep Score:</b> '+score+'/100<br><b>Tip:</b> '+tips;
+            document.getElementById('sleepResult').classList.add('show');
+            document.getElementById('sleepScore').textContent=score;
+        }
+        function genWorkout() {
+            const level=document.getElementById('fitLevel').value,goal=document.getElementById('workoutGoal').value;
+            const plans={
+                'Beginner':{'Fat Loss':'1) 5 min warm-up walk 2) 20 min brisk walk 3) 3x12 squats 4) 3x10 wall push-ups 5) 5 min stretch','Muscle Gain':'1) 5 min warm-up 2) 3x10 push-ups 3) 3x12 squats 4) 3x10 lunges 5) 5 min stretch','General Fitness':'1) 10 min walk 2) 3x15 squats 3) 3x10 push-ups 4) 3x30s plank 5) 5 min stretch'},
+                'Intermediate':{'Fat Loss':'1) 10 min jog 2) 3x15 jump squats 3) 3x15 mountain climbers 4) 3x12 push-ups 5) 10 min HIIT','Muscle Gain':'1) 5 min warm-up 2) 4x12 push-ups 3) 4x15 squats 4) 3x12 dips 5) 3x30s plank','General Fitness':'1) 15 min jog 2) 3x20 squats 3) 3x15 push-ups 4) 3x45s plank 5) 10 min stretch'},
+                'Advanced':{'Fat Loss':'1) 20 min run 2) 5x20 burpees 3) 5x25 jump squats 4) 5x20 mountain climbers 5) 15 min HIIT','Muscle Gain':'1) 10 min warm-up 2) 5x15 push-ups 3) 5x20 squats 4) 4x15 dips 5) 4x45s plank','General Fitness':'1) 30 min cardio 2) 5x20 squats 3) 5x20 push-ups 4) 5x60s plank 5) 15 min stretch'}
+            };
+            document.getElementById('workoutResult').innerHTML=plans[level][goal];
+            document.getElementById('workoutResult').classList.add('show');
+        }
+        document.getElementById('stepProgress').style.width=(8420/100)+'%';
+    </script>
+</body>
+</html>
